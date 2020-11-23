@@ -1,0 +1,227 @@
+const fs = require('fs');
+const express = require('express');
+const bodyParser = require('body-parser');
+const app = express();
+const port = process.env.PORT || 5000;
+
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true}));
+
+const data = fs.readFileSync('./database.json');
+const conf = JSON.parse(data);
+const mysql = require('mysql');
+
+const connection = mysql.createConnection({
+    host: conf.development.host,
+    user: conf.development.user,
+    password: conf.development.password,
+    port: conf.development.port,
+    database: conf.development.database
+});
+connection.connect();
+
+const path = require('path');
+const hashing = require(path.join(__dirname, '', 'hashing.js')); // 두번째 인자 경로? 'config'
+const salt = conf.salt;
+
+const multer = require('multer');
+const upload = multer({dest: './upload'})
+
+app.get('/api/customers', (req, res) => {
+    connection.query(
+      "SELECT * FROM CUSTOMER WHERE isDeleted = 0",
+      (err, rows, fields) => {
+          res.send(rows);
+          console.log(err);
+      }  
+    );
+});
+
+app.use('/image', express.static('./upload'));
+
+app.post('/api/customers', upload.single('image'), (req, res) => {
+    let sql = 'INSERT INTO CUSTOMER VALUES (null, ?, ?, ?, ?, ?, now(), null, 0)';
+    let image = '/image/' + req.file.filename;
+    let name = req.body.name;
+    let birthday = req.body.birthday;
+    let gender = req.body.gender;
+    let job = req.body.job;
+    let params = [image, name, birthday, gender, job];
+    connection.query(sql, params, 
+        (err, rows, fields) => {
+            res.send(rows);
+            console.log(rows);
+            console.log(err);
+        }
+    );
+});
+
+app.delete('/api/customers/:id', (req, res) => {
+    let sql = 'UPDATE CUSTOMER SET isDeleted = 1, deletedDate = now() WHERE id = ?';
+    let params = [req.params.id];
+    connection.query(sql, params,
+        (err, rows, fields) => {
+            res.send(rows);
+            console.log(err);
+        }
+    )
+});
+
+
+// app.get('/', (req, res) => {
+//     res.send({message: 'Hello Home!'});
+// });
+
+/**
+ * Space
+ */
+
+app.get('/api/spaces', (req, res) => {
+    connection.query(
+      "SELECT id, name, code, type, DATE_FORMAT(createdDate, '%Y-%m-%d %T') as createdDate FROM SPACE WHERE isDeleted = 0",
+      (err, rows, fields) => {
+          res.send(rows);
+          console.log(err);
+      }  
+    );
+});
+
+app.get('/api/spaces/:id', (req, res) => {
+    let sql = "SELECT id, name, code, type, "
+    + " (SELECT COUNT(couponId) FROM COUPON WHERE spaceId=?) as couponCount "
+    + " FROM SPACE WHERE id = ? ";
+    let params = [req.params.id, req.params.id];
+    connection.query(sql, params,
+      (err, rows, fields) => {
+          res.send(rows);
+          console.log(err);
+      }  
+    );
+});
+
+app.post('/api/spaces', upload.single('image'), (req, res) => {
+    let sql = 'INSERT INTO SPACE (name, type, code, isDeleted, createdDate) VALUES (?, ?, ?, 0, now())';
+    let name = req.body.name;
+    let type = req.body.type;
+    let code = req.body.code;
+    let params = [name, type, code];
+    connection.query(sql, params, 
+        (err, rows, fields) => {
+            res.send(rows);
+            console.log(rows);
+            console.log(err);
+        }
+    );
+});
+
+app.delete('/api/spaces/:id', (req, res) => {
+    let sql = 'UPDATE SPACE SET isDeleted = 1, deletedDate = now() WHERE id = ?';
+    let params = [req.params.id];
+    connection.query(sql, params,
+        (err, rows, fields) => {
+            res.send(rows);
+            console.log(err);
+        }
+    )
+});
+
+app.post('/api/spaces/update/:id', upload.single('image'), (req, res) => {
+    let sql = 'UPDATE SPACE SET name = ?, type = ?, code = ? WHERE id = ?';
+    let params = [req.body.name, req.body.type, req.body.code, req.body.id];
+    console.log(params);
+    connection.query(sql, params,
+        (err, rows, fields) => {
+            res.send(rows);
+            console.log(rows);
+            console.log(err);
+        }
+    )
+});
+
+
+
+/**
+ * Coupon
+ */
+
+app.get('/api/couponsBySpace/:id', (req, res) => {
+    let sql = "SELECT spaceId, couponId, couponCode, couponMenu, "
+            + " DATE_FORMAT(couponStartDate, '%Y-%m-%d') as couponStartDate, "
+            + " DATE_FORMAT(couponEndDate, '%Y-%m-%d') as couponEndDate, "
+            + " DATE_FORMAT(staffCheck, '%Y-%m-%d %T') as staffCheck, "
+            + " DATE_FORMAT(confirmOffer, '%Y-%m-%d %T') as confirmOffer, "
+            + " DATE_FORMAT(createdDate, '%Y-%m-%d %T') as createdDate "
+            // + " (SELECT code FROM SPACE WHERE id=?) as spaceCode, "
+            // + " (SELECT COUNT(couponId) FROM COUPON WHERE spaceId=?) as couponNumber "
+            + " FROM COUPON "
+            + " WHERE isDeleted = 0 AND spaceId = ?";
+    let params = [req.params.id];
+    connection.query(sql, params, 
+      (err, rows, fields) => {
+          res.send(rows);
+          console.log(err);
+      }  
+    );
+});
+
+app.get('/api/coupons/:id', (req, res) => {
+    let sql = "SELECT spaceId, couponId, couponCode, couponMenu, "
+            + " DATE_FORMAT(couponStartDate, '%Y-%m-%d') as couponStartDate, "
+            + " DATE_FORMAT(couponEndDate, '%Y-%m-%d') as couponEndDate, "
+            + " FROM COUPON "
+            + " WHERE id = ?";
+    let params = [req.params.id];
+    connection.query(sql, params,
+      (err, rows, fields) => {
+          res.send(rows);
+          console.log(err);
+      }  
+    );
+});
+
+app.post('/api/coupons', upload.single('image'), (req, res) => {
+    let sql = 'INSERT INTO COUPON (spaceId, couponCode, couponMenu, couponStartDate, couponEndDate, isDeleted, createdDate, hashCode) VALUES (?, ?, ?, now(), ?, 0, now(), ?)';
+    // console.log('req.body.spaceId-'+req.body.spaceId)
+    let spaceId = req.body.spaceId;
+    let couponCode = req.body.couponCode;
+    let couponMenu = req.body.couponMenu;
+    // let couponStartDate = req.body.couponStartDate;
+    let couponEndDate = req.body.couponEndDate;
+    let hash = hashing.enc(couponCode+couponMenu+couponEndDate, salt);
+    let params = [spaceId, couponCode, couponMenu, couponEndDate, hash];
+    console.log(params);
+    connection.query(sql, params, 
+        (err, rows, fields) => {
+            res.send(rows);
+            console.log(rows);
+            console.log(err);
+        }
+    );
+});
+
+app.delete('/api/coupons/:id', (req, res) => {
+    let sql = 'UPDATE COUPON SET isDeleted = 1, deletedDate = now() WHERE couponId = ?';
+    let params = [req.params.id];
+    connection.query(sql, params,
+        (err, rows, fields) => {
+            res.send(rows);
+            console.log(err);
+        }
+    )
+});
+
+app.post('/api/coupons/update/:id', upload.single('image'), (req, res) => {
+    let sql = 'UPDATE COUPON SET couponCode = ?, couponMenu = ?, couponEndDate = ?, hashCode=? WHERE couponId = ?';
+    let hash = hashing.enc(req.body.couponCode+req.body.couponMenu+req.body.couponEndDate, salt);
+    let params = [req.body.couponCode, req.body.couponMenu, req.body.couponEndDate, hash, req.body.couponId];
+    console.log(params);
+    connection.query(sql, params,
+        (err, rows, fields) => {
+            res.send(rows);
+            console.log(rows);
+            console.log(err);
+        }
+    )
+});
+
+app.listen(port, () => console.log(`Listening on port ${port}`));
