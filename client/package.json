@@ -37,12 +37,12 @@
     "url": "git+https://github.com/riky1979/space-dot-management.git"
   },
   "keywords": [],
-  "author": "Creative Tim <hello@creative-tim.com> (https://www.creative-tim.com/)",
+  "author": "Yong2",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/riky1979/space-dot-management/issues"
   },
-  "homepage": "http://space-dot.com",
+  "homepage": "",
   "optionalDependencies": {
     "@types/googlemaps": "3.39.6",
     "@types/markerclustererplus": "2.1.33",
