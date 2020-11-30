@@ -20,7 +20,7 @@ import Card from "components/Card/Card.js";
 import CardHeader from "components/Card/CardHeader.js";
 // import CardAvatar from "components/Card/CardAvatar.js";
 import CardBody from "components/Card/CardBody.js";
-import CardFooter from "components/Card/CardFooter.js";
+// import CardFooter from "components/Card/CardFooter.js";
 import useInputs from './useInputs';
 
 // import avatar from "assets/img/faces/marc.jpg";
@@ -67,6 +67,9 @@ const useStyles = makeStyles((theme) => ({
       marginBottom: "3px",
       textDecoration: "none"
     },
+    hidden: {
+      display: 'none'
+    },
 }));
 
 export default function SpaceEdit(props) {
@@ -77,12 +80,14 @@ export default function SpaceEdit(props) {
   const [state, handleInputChange] = useInputs({
     name: selectedItem.name,
     type: selectedItem.type,
-    code: selectedItem.code
+    code: selectedItem.code,
+    file: '',
+    fileName: selectedItem.image,
   });
 
   const [ open, setOpen ] = useState(false);
 
-  const { name, type, code } = state;
+  const { name, type, code, file, fileName } = state;
 
   const editSpace = () => {
     if(!selectedItems && selectedItems.length === 0) {
@@ -94,6 +99,7 @@ export default function SpaceEdit(props) {
     formData.append('name', name);
     formData.append('type', type);
     formData.append('code', code);
+    formData.append('image', file);
     const config = {
         headers: {
             'content-type': 'multipart/form-data'
@@ -102,10 +108,26 @@ export default function SpaceEdit(props) {
     return post(url, formData, config);
   };
 
+  const handleFileChange = (e) => {
+    handleInputChange({
+      target: {
+        name: 'file',
+        value: e.target.files[0]
+      }
+    });
+
+    handleInputChange({
+      target: {
+        name: 'fileName',
+        value: e.target.value
+      }
+    });
+  }
+
 
   const handleSubmit = e => {
     e.preventDefault();
-    console.log([name, type, code]);
+    console.log([name, type, code, file]);
     editSpace()
         .then((response) => {
             console.log(response.data);
@@ -154,8 +176,7 @@ export default function SpaceEdit(props) {
                                 value={name}
                             />
                             </GridItem>
-                            <GridItem xs={12} sm={12} md={12}>
-                            {/* <InputLabel style={{ color: "#AAAAAA" }}>Space Name</InputLabel> */}
+                            <GridItem xs={12} sm={12} md={6}>
                             <CustomInput
                                 labelText="Space Type"
                                 id="type"
@@ -167,7 +188,7 @@ export default function SpaceEdit(props) {
                                 value={type}
                             />
                             </GridItem>
-                            <GridItem xs={12} sm={12} md={12}>
+                            <GridItem xs={12} sm={12} md={6}>
                             <CustomInput
                                 labelText="Space Code"
                                 id="code"
@@ -179,18 +200,24 @@ export default function SpaceEdit(props) {
                                 value={code}
                             />
                             </GridItem>
+                            <GridItem xs={12} sm={12} md={12}>
+                              <input className={classes.hidden} accept="image/*" id="raised-button-file" type="file" onChange={handleFileChange}/><br/>
+                              <label htmlFor="raised-button-file">
+                                  <Button variant="contained" color="primary" component="span" name="file">
+                                      {fileName ? fileName : "이미지 선택"}
+                                  </Button>
+                                  <span>&nbsp;이미지 : 350 X 246</span>
+                              </label>
+                            </GridItem>
                         </GridContainer>
                         </CardBody>
-                        <CardFooter>
-                        {/* <Button color="primary" onClick={handleSubmit}>Create Space</Button> */}
-                        </CardFooter>
                     </Card>
                     </GridItem>
                 </GridContainer>
             </DialogContent>
             <DialogActions>
                 <Button variant="contained" color="primary" onClick={handleSubmit}>수정</Button>
-                <Button variant="outlined" color="primary" onClick={handleClose}>닫기</Button>
+                <Button variant="outlined" color="inherit" onClick={handleClose}>닫기</Button>
             </DialogActions>
         </Dialog>
       

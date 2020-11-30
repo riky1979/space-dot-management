@@ -230,7 +230,7 @@ export default function CouponAdd(props) {
             </DialogContent>
             <DialogActions>
                 <Button variant="contained" color="primary" onClick={handleSubmit}>추가</Button>
-                <Button variant="outlined" color="primary" onClick={handleClose}>닫기</Button>
+                <Button variant="outlined" color="inherit" onClick={handleClose}>닫기</Button>
             </DialogActions>
         </Dialog>
       

@@ -13,17 +13,19 @@
     "history": "4.10.1",
     "perfect-scrollbar": "1.5.0",
     "prop-types": "15.7.2",
-    "react": "16.13.1",
+    "react": "^16.13.1",
     "react-chartist": "0.14.3",
+    "react-copy-to-clipboard": "^5.0.2",
     "react-dom": "16.13.1",
     "react-google-maps": "9.4.5",
     "react-router-dom": "5.2.0",
-    "react-scripts": "3.4.1",
+    "react-scripts": "^4.0.1",
     "react-swipeable-views": "0.13.9"
   },
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
+    "build-test": "serve -s build",
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject",
     "install:clean": "rm -rf node_modules/ && rm -rf package-lock.json && npm install && npm start",
@@ -64,5 +66,5 @@
     ],
     "development": []
   },
-  "proxy": "http://localhost:5000/"
+  "proxy": "http://localhost:8001/"
 }

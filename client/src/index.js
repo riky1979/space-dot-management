@@ -34,8 +34,8 @@ ReactDOM.render(
     <Switch>
       <Route path="/admin" component={Admin} />
       <Route path="/rtl" component={RTL} />
-      <Route path="/coupon" component={Coupon} />
-      <Redirect from="/" to="/admin/dashboard" />
+      <Route path="/coupon/:hashCode" component={Coupon} />
+      {/* <Redirect from="/" to="/admin/dashboard" /> */}
     </Switch>
   </Router>,
   document.getElementById("root")

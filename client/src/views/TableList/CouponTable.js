@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import clsx from 'clsx';
 import { lighten, makeStyles } from '@material-ui/core/styles';
+import { Grid } from '@material-ui/core';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
@@ -22,8 +23,10 @@ import Checkbox from '@material-ui/core/Checkbox';
 // import FilterListIcon from '@material-ui/icons/FilterList';
 import CouponDelete from "../Forms/CouponDelete.js";
 import CouponEdit from "../Forms/CouponEdit.js";
-import { Grid } from '@material-ui/core';
-
+import CouponStaffCheckCancel from "../Forms/CouponStaffCheckCancel.js";
+import CouponConfirmOffer from "../Forms/CouponConfirmOffer.js";
+import CouponCancelOffer from "../Forms/CouponCancelOffer.js";
+import CouponPreview from "../Forms/CouponPreview.js";
 
 function descendingComparator(a, b, orderBy) {
   if (b[orderBy] < a[orderBy]) {
@@ -59,6 +62,7 @@ const headCells = [
   { id: 'couponEndDate', numeric: false, disablePadding: false, label: '유효기간' },
   { id: 'staffCheck', numeric: false, disablePadding: false, label: '직원확인' },
   { id: 'confirmOffer', numeric: false, disablePadding: false, label: '지급확인' },
+  { id: 'hashCode', numeric: false, disablePadding: false, label: '보기' },
 ];
 
 function CouponTableHead(props) {
@@ -231,10 +235,8 @@ export default function CouponTable(props) {
   const [selected, setSelected] = React.useState([]);
   const [selectedItems, setSelectedItems] = React.useState([]);
   const [page, setPage] = React.useState(0);
-//   const [dense, setDense] = React.useState(true);
-  const [rowsPerPage, setRowsPerPage] = React.useState(5);
 
-  // const [selectedSpaceId, setSelectedSpaceId] = React.useState(spaceId);
+  const [rowsPerPage, setRowsPerPage] = React.useState(5);
   const [selectedItem, setSelectedItem] = React.useState({
     couponId: '',
     couponCode: '',
@@ -244,34 +246,16 @@ export default function CouponTable(props) {
 
   let emptyRows = rowsPerPage - Math.min(rowsPerPage, tableData.length - page * rowsPerPage);
 
-  // forwardRef forwardRef((flag) => initState(flag));
-
-  // function initState(flag) {
-  //   if(!flag) return;
-
-  //   setSelected([]);
-  //   setSelectedItems([]);
-  //   setSelectedItem({
-  //     couponId: '',
-  //     couponCode: '',
-  //     couponMenu: '',
-  //     couponEndDate: '',
-  //   });
-  // }
-
-  // React.useEffect(() => {
-
-  //   setSelected(() => []);
-  //   setSelectedItems(() => []);
-  //   setSelectedItems(() => {
-  //     return {
-  //       couponId: '',
-  //       couponCode: '',
-  //       couponMenu: '',
-  //       couponEndDate: '',
-  //     };
-  //   });
-  // }, []);//selected, selectedItems, selectedItem
+  React.useEffect(() => {
+    setSelected([]);
+    setSelectedItems([]);
+    setSelectedItem({
+      couponId: '',
+      couponCode: '',
+      couponMenu: '',
+      couponEndDate: '',
+    });
+  }, [tableData]);
 
   const handleRequestSort = (event, property) => {
     const isAsc = orderBy === property && order === 'asc';
@@ -344,30 +328,23 @@ export default function CouponTable(props) {
       stateRefresh();
   };
 
-  // const selectedStateRefresh = React.useCallback(() => {
-  //   setSelected([]);
-  //   setSelectedItems([]);
-  //   setSelectedItem({
-  //     couponId: '',
-  //     couponCode: '',
-  //     couponMenu: '',
-  //     couponEndDate: '',
-  //   });
-  //   stateRefresh();
-  // }, [stateRefresh]);//selected, selectedItem, selectedItems
+  const isSelected = (id) => selected.indexOf(id) !== -1;
 
-  // React.useEffect(() => {
-  //   selectedStateRefresh();
-  // }, [selectedStateRefresh]);
+  const displayConfirmOfferField = (confirmOffer, staffCheck, id, code) => {
+    //{row.confirmOffer}{row.confirmOffer ? <CouponCancelOffer couponId={row.couponId} couponCode={row.couponCode} stateRefresh={selectedStateRefresh} /> : <CouponConfirmOffer couponId={row.couponId} couponCode={row.couponCode} stateRefresh={selectedStateRefresh} />}
+    if(staffCheck) {
+      if(confirmOffer) {
+        return (<div>{confirmOffer}<CouponCancelOffer couponId={id} couponCode={code} stateRefresh={selectedStateRefresh} /></div>);
+      } else {
+        return (<CouponConfirmOffer couponId={id} couponCode={code} stateRefresh={selectedStateRefresh} />);
+      }
+    }
 
-
+    return (confirmOffer);
+  };
   
 
-//   const handleChangeDense = (event) => {
-//     setDense(event.target.checked);
-//   };
 
-  const isSelected = (id) => selected.indexOf(id) !== -1;
 
 
   return (
@@ -419,8 +396,9 @@ export default function CouponTable(props) {
                       </TableCell>
                       <TableCell align="left">{row.couponMenu}</TableCell>
                       <TableCell align="left">{row.couponEndDate}</TableCell>
-                      <TableCell align="left">{row.staffCheck}</TableCell>
-                      <TableCell align="left">{row.confirmOffer}</TableCell>
+                      <TableCell align="left">{row.staffCheck ? <div>{row.staffCheck} <CouponStaffCheckCancel couponId={row.couponId} couponCode={row.couponCode} stateRefresh={selectedStateRefresh} /></div> : <span></span>}</TableCell>
+                      <TableCell align="left">{displayConfirmOfferField(row.confirmOffer, row.staffCheck, row.couponId, row.couponCode)}</TableCell>
+                      <TableCell align="left"><CouponPreview hashCode={row.hashCode} stateRefresh={selectedStateRefresh} /></TableCell>
                     </TableRow>
                   );
                 })}

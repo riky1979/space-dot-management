@@ -194,7 +194,7 @@ export default function CouponEdit(props) {
             </DialogContent>
             <DialogActions>
                 <Button variant="contained" color="primary" onClick={handleSubmit}>수정</Button>
-                <Button variant="outlined" color="primary" onClick={handleClose}>닫기</Button>
+                <Button variant="outlined" color="inherit" onClick={handleClose}>닫기</Button>
             </DialogActions>
         </Dialog>
       

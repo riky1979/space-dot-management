@@ -246,7 +246,8 @@ export default function SpaceTable(props) {
   const [selectedItem, setSelectedItem] = React.useState({
     name: '',
     type: '',
-    code: ''
+    code: '',
+    image: ''
   });
 
   let emptyRows = rowsPerPage - Math.min(rowsPerPage, tableData.length - page * rowsPerPage);
@@ -267,14 +268,14 @@ export default function SpaceTable(props) {
     setSelectedItems([]);
   };
 
-  const handleClick = (event, id, sName, sType, sCode) => {    
+  const handleClick = (event, id, sName, sType, sCode, image) => {    
     const selectedIndex = selected.indexOf(id);
     let newSelected = [];
     let newSelecteditems = [];
 
     if (selectedIndex === -1) {
       newSelected = newSelected.concat(selected, id);
-      newSelecteditems = newSelecteditems.concat(selectedItems, {name: sName, type: sType, code: sCode});
+      newSelecteditems = newSelecteditems.concat(selectedItems, {name: sName, type: sType, code: sCode, image: image});
     } else if (selectedIndex === 0) {
       newSelected = newSelected.concat(selected.slice(1));
       newSelecteditems = newSelecteditems.concat(selectedItems.slice(1));
@@ -315,7 +316,8 @@ export default function SpaceTable(props) {
     setSelectedItem({
       name: '',
       type: '',
-      code: ''
+      code: '',
+      image: ''
     });
     stateRefresh();
   };
@@ -358,7 +360,7 @@ export default function SpaceTable(props) {
                   return (
                     <TableRow
                       hover
-                      onClick={(event) => handleClick(event, row.id, row.name, row.type, row.code)}
+                      onClick={(event) => handleClick(event, row.id, row.name, row.type, row.code, row.image)}
                       role="checkbox"
                       aria-checked={isItemSelected}
                       tabIndex={-1}
