@@ -1,13 +1,18 @@
 const fs = require('fs');
 const express = require('express');
 const bodyParser = require('body-parser');
+const path = require('path');
 const app = express();
-const port = process.env.PORT || 5000;
+const port = process.env.PORT || 8001;
+
+app.use(express.static(path.join(__dirname, '')));
+app.use(express.static(path.join(__dirname, 'static')));
+app.use('/image', express.static(path.join(__dirname, 'upload')));
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true}));
 
-const data = fs.readFileSync('./database.json');
+const data = fs.readFileSync(path.join(__dirname, '', 'database.json'));
 const conf = JSON.parse(data);
 const mysql = require('mysql');
 
@@ -20,12 +25,19 @@ const connection = mysql.createConnection({
 });
 connection.connect();
 
-const path = require('path');
+
 const hashing = require(path.join(__dirname, '', 'hashing.js')); // 두번째 인자 경로? 'config'
 const salt = conf.salt;
 
 const multer = require('multer');
-const upload = multer({dest: './upload'})
+const upload = multer({dest: path.join(__dirname, 'upload')});
+
+app.get('/admin/*', (req, res) => {
+    res.sendFile(path.join(__dirname, '', 'index.html'));
+});
+app.get('/coupon/:hash', (req, res) => {
+    res.sendFile(path.join(__dirname, '', 'index.html'));
+});
 
 app.get('/api/customers', (req, res) => {
     connection.query(
@@ -37,7 +49,6 @@ app.get('/api/customers', (req, res) => {
     );
 });
 
-app.use('/image', express.static('./upload'));
 
 app.post('/api/customers', upload.single('image'), (req, res) => {
     let sql = 'INSERT INTO CUSTOMER VALUES (null, ?, ?, ?, ?, ?, now(), null, 0)';
@@ -78,7 +89,7 @@ app.delete('/api/customers/:id', (req, res) => {
 
 app.get('/api/spaces', (req, res) => {
     connection.query(
-      "SELECT id, name, code, type, DATE_FORMAT(createdDate, '%Y-%m-%d %T') as createdDate FROM SPACE WHERE isDeleted = 0",
+      "SELECT id, name, code, type, DATE_FORMAT(createdDate, '%Y-%m-%d %T') as createdDate, image FROM SPACE WHERE isDeleted = 0",
       (err, rows, fields) => {
           res.send(rows);
           console.log(err);
@@ -88,7 +99,8 @@ app.get('/api/spaces', (req, res) => {
 
 app.get('/api/spaces/:id', (req, res) => {
     let sql = "SELECT id, name, code, type, "
-    + " (SELECT COUNT(couponId) FROM COUPON WHERE spaceId=?) as couponCount "
+    + " (SELECT COUNT(couponId) FROM COUPON WHERE spaceId=?) as couponCount, "
+    + " image "
     + " FROM SPACE WHERE id = ? ";
     let params = [req.params.id, req.params.id];
     connection.query(sql, params,
@@ -100,11 +112,12 @@ app.get('/api/spaces/:id', (req, res) => {
 });
 
 app.post('/api/spaces', upload.single('image'), (req, res) => {
-    let sql = 'INSERT INTO SPACE (name, type, code, isDeleted, createdDate) VALUES (?, ?, ?, 0, now())';
+    let sql = 'INSERT INTO SPACE (name, type, code, isDeleted, createdDate, image) VALUES (?, ?, ?, 0, now(), ?)';
     let name = req.body.name;
     let type = req.body.type;
     let code = req.body.code;
-    let params = [name, type, code];
+    let image = req.file ? '/image/' + req.file.filename : null;
+    let params = [name, type, code, image];
     connection.query(sql, params, 
         (err, rows, fields) => {
             res.send(rows);
@@ -126,8 +139,20 @@ app.delete('/api/spaces/:id', (req, res) => {
 });
 
 app.post('/api/spaces/update/:id', upload.single('image'), (req, res) => {
-    let sql = 'UPDATE SPACE SET name = ?, type = ?, code = ? WHERE id = ?';
-    let params = [req.body.name, req.body.type, req.body.code, req.body.id];
+    let image = req.file ? '/image/' + req.file.filename : null;
+    let sql = "UPDATE SPACE SET name = ?, type = ?, code = ? ";
+    if(image) {
+        sql += ", image = ?";
+    }
+    sql += " WHERE id = ?";
+    
+    let params;
+    if(image) {
+        params = [req.body.name, req.body.type, req.body.code, image, req.body.id];
+    } else {
+        params = [req.body.name, req.body.type, req.body.code, req.body.id];
+    }
+    
     console.log(params);
     connection.query(sql, params,
         (err, rows, fields) => {
@@ -150,7 +175,9 @@ app.get('/api/couponsBySpace/:id', (req, res) => {
             + " DATE_FORMAT(couponEndDate, '%Y-%m-%d') as couponEndDate, "
             + " DATE_FORMAT(staffCheck, '%Y-%m-%d %T') as staffCheck, "
             + " DATE_FORMAT(confirmOffer, '%Y-%m-%d %T') as confirmOffer, "
-            + " DATE_FORMAT(createdDate, '%Y-%m-%d %T') as createdDate "
+            + " DATE_FORMAT(createdDate, '%Y-%m-%d %T') as createdDate, "
+            + " hashCode "
+            // + " CONCAT('/api/coupon/', hashCode) as link "
             // + " (SELECT code FROM SPACE WHERE id=?) as spaceCode, "
             // + " (SELECT COUNT(couponId) FROM COUPON WHERE spaceId=?) as couponNumber "
             + " FROM COUPON "
@@ -171,6 +198,25 @@ app.get('/api/coupons/:id', (req, res) => {
             + " FROM COUPON "
             + " WHERE id = ?";
     let params = [req.params.id];
+    connection.query(sql, params,
+      (err, rows, fields) => {
+          res.send(rows);
+          console.log(err);
+      }  
+    );
+});
+
+app.get('/api/coupon/:hash', (req, res) => {
+    let sql = "SELECT C.spaceId, S.name as spaceName, couponCode, couponMenu "
+            + " , DATE_FORMAT(couponEndDate, '%Y.%m.%d') as couponEndDate "
+            + " , CASE WHEN NOW() > DATE_ADD(couponEndDate, INTERVAL 1 DAY) THEN TRUE ELSE FALSE END as isExpired "
+            + " , CASE WHEN staffCheck IS NULL THEN FALSE ELSE TRUE END AS usedCoupon "
+            + " , S.image "
+            + " FROM COUPON as C "
+            + " INNER JOIN SPACE as S "
+            + " ON C.spaceId = S.id "
+            + " WHERE C.hashCode = ?";
+    let params = [req.params.hash];
     connection.query(sql, params,
       (err, rows, fields) => {
           res.send(rows);
@@ -223,5 +269,63 @@ app.post('/api/coupons/update/:id', upload.single('image'), (req, res) => {
         }
     )
 });
+
+app.post('/api/coupon/use', upload.single('image'), (req, res) => {
+    let sql = 'UPDATE COUPON SET staffCheck = NOW() WHERE hashCode = ?';
+    let hashCode = req.body.hashCode;
+    let params = [hashCode];
+    console.log(params);
+    connection.query(sql, params,
+        (err, rows, fields) => {
+            res.send(rows);
+            console.log(rows);
+            console.log(err);
+        }
+    )
+});
+
+app.post('/api/coupon/staffcancel', upload.single('image'), (req, res) => {
+    let sql = 'UPDATE COUPON SET staffCheck = NULL WHERE couponId = ?';
+    let couponId = req.body.couponId;
+    let params = [couponId];
+    console.log(params);
+    connection.query(sql, params,
+        (err, rows, fields) => {
+            res.send(rows);
+            console.log(rows);
+            console.log(err);
+        }
+    )
+});
+
+app.post('/api/coupon/confirmOffer', upload.single('image'), (req, res) => {
+    let sql = 'UPDATE COUPON SET confirmOffer = NOW() WHERE couponId = ?';
+    let couponId = req.body.couponId;
+    let params = [couponId];
+    console.log(params);
+    connection.query(sql, params,
+        (err, rows, fields) => {
+            res.send(rows);
+            console.log(rows);
+            console.log(err);
+        }
+    )
+});
+
+app.post('/api/coupon/cancelOffer', upload.single('image'), (req, res) => {
+    let sql = 'UPDATE COUPON SET confirmOffer = NULL WHERE couponId = ?';
+    let couponId = req.body.couponId;
+    let params = [couponId];
+    console.log(params);
+    connection.query(sql, params,
+        (err, rows, fields) => {
+            res.send(rows);
+            console.log(rows);
+            console.log(err);
+        }
+    )
+});
+
+
 
 app.listen(port, () => console.log(`Listening on port ${port}`));
