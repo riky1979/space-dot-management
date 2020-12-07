@@ -18,10 +18,10 @@ let callApi = async () => {
   return body;
 };
 
-const convertToTableData = (data) => {
-  console.log(data);
-  return data.spaces;
-};
+// const convertToTableData = (data) => {
+//   console.log(data);
+//   return data.spaces;
+// };
 
 // const useStyles = makeStyles((theme) => ({
 //   button: {
@@ -32,12 +32,21 @@ const convertToTableData = (data) => {
 export default function SpaceList() {
   // const classes = useStyles();
   const [spaces, setSpaces] = React.useState('');
+  // console.log('searchKeyword:'+searchKeyword);
+  //const [searchKeyword, setSearchKeyword] = React.useState('');
+
+  // const [data, setData] = React.useState({
+  //   spaces: '',
+  //   searchKeyword: '',
+  // });
+
+  // const { spaces, searchKeyword } = data;
 
   const callList = () => {
     callApi()
       .then(json => {
         console.log(json);
-        setSpaces({spaces: json});
+        setSpaces(json);
       })
       .catch(err => console.log(err));
   };
@@ -51,6 +60,15 @@ export default function SpaceList() {
     callList();
   };
 
+  const filteredSpaces = (data) => {
+    // if(searchKeyword) {
+    //   data = data.filter((c) => {
+    //     return c.name.indexOf(searchKeyword) > -1;
+    //   });
+    // }
+    return <SpaceTable tableData={data} stateRefresh={stateRefresh} />;
+  }
+
   return (
     <GridContainer>
       <GridItem xs={12} sm={12} md={12}>
@@ -59,7 +77,7 @@ export default function SpaceList() {
             <SpaceAdd stateRefresh={stateRefresh} />
           </CardHeader>
           <CardBody>
-            {spaces ? <SpaceTable tableData={convertToTableData(spaces)} stateRefresh={stateRefresh} /> : <span>loding...</span>}
+            {spaces ? filteredSpaces(spaces) : <span>loding...</span>}
           </CardBody>
         </Card>
       </GridItem>

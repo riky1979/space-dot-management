@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { post } from 'axios';
+import { useForm } from "react-hook-form";
 // @material-ui/core components
 import { makeStyles } from "@material-ui/core/styles";
 // import InputLabel from "@material-ui/core/InputLabel";
@@ -19,29 +20,6 @@ import CardBody from "components/Card/CardBody.js";
 // import CardFooter from "components/Card/CardFooter.js";
 import useInputs from './useInputs';
 
-// import avatar from "assets/img/faces/marc.jpg";
-
-
-// const styles = {
-//   cardCategoryWhite: {
-//     color: "rgba(255,255,255,.62)",
-//     margin: "0",
-//     fontSize: "14px",
-//     marginTop: "0",
-//     marginBottom: "0"
-//   },
-//   cardTitleWhite: {
-//     color: "#FFFFFF",
-//     marginTop: "0px",
-//     minHeight: "auto",
-//     fontWeight: "300",
-//     fontFamily: "'Roboto', 'Helvetica', 'Arial', sans-serif",
-//     marginBottom: "3px",
-//     textDecoration: "none"
-//   }
-// };
-
-// const useStyles = makeStyles(styles);
 
 const useStyles = makeStyles((theme) => ({
     button: {
@@ -71,6 +49,8 @@ const useStyles = makeStyles((theme) => ({
 export default function SpaceAdd(props) {
   const classes = useStyles();
 
+  const { register, errors, handleSubmit } = useForm();
+
   const [state, handleInputChange] = useInputs({
     name: '',
     type: 'CAFE',
@@ -96,8 +76,8 @@ export default function SpaceAdd(props) {
       return post(url, formData, config);
   };
 
-  const handleSubmit = e => {
-    e.preventDefault();
+  const onSubmit = e => {
+    //e.preventDefault();
     console.log([name, type, code, file]);
     addSpace()
         .then((response) => {
@@ -133,8 +113,6 @@ export default function SpaceAdd(props) {
     setOpen(false);
   };
 
-
-
   return (
     <div>
         <Button variant="contained" onClick={handleClickOpen}>
@@ -161,6 +139,11 @@ export default function SpaceAdd(props) {
                                 onChange={handleInputChange}
                                 name="name"
                                 value={name}
+                                inputProps={{
+                                  inputRef: register({ required: true }),
+                                  placeholder: errors && errors.name && "This field is required"
+                                }}
+                                error={errors && errors.name ? true : undefined}
                             />
                             </GridItem>
                             <GridItem xs={12} sm={12} md={6}>
@@ -173,6 +156,11 @@ export default function SpaceAdd(props) {
                                 onChange={handleInputChange}
                                 name="type"
                                 value={type}
+                                inputProps={{
+                                  inputRef: register({ required: true }),
+                                  placeholder: errors && errors.type && "This field is required"
+                                }}
+                                error={errors && errors.type ? true : undefined}
                             />
                             </GridItem>
                             <GridItem xs={12} sm={12} md={6}>
@@ -185,6 +173,11 @@ export default function SpaceAdd(props) {
                                 onChange={handleInputChange}
                                 name="code"
                                 value={code}
+                                inputProps={{
+                                  inputRef: register({ required: true }),
+                                  placeholder: errors && errors.code && "This field is required"
+                                }}
+                                error={errors && errors.code ? true : undefined}
                             />
                             </GridItem>
                             <GridItem xs={12} sm={12} md={12}>
@@ -203,8 +196,8 @@ export default function SpaceAdd(props) {
                 </GridContainer>
             </DialogContent>
             <DialogActions>
-                <Button variant="contained" color="primary" onClick={handleSubmit}>추가</Button>
-                <Button variant="outlined" color="inherit" onClick={handleClose}>닫기</Button>
+                <Button variant="contained" color="primary" onClick={handleSubmit(onSubmit)}>추가</Button>
+                <Button variant="outlined" onClick={handleClose}>닫기</Button>
             </DialogActions>
         </Dialog>
       

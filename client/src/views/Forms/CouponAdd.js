@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { post } from 'axios';
+import { useForm } from "react-hook-form";
 // @material-ui/core components
 import { makeStyles } from "@material-ui/core/styles";
 // import InputLabel from "@material-ui/core/InputLabel";
@@ -16,35 +17,11 @@ import Card from "components/Card/Card.js";
 import CardHeader from "components/Card/CardHeader.js";
 // import CardAvatar from "components/Card/CardAvatar.js";
 import CardBody from "components/Card/CardBody.js";
-import CardFooter from "components/Card/CardFooter.js";
+// import CardFooter from "components/Card/CardFooter.js";
 // import useInputs from './useInputs';
 import moment from 'moment';
 // import leftPad from '@bit/saschamz.react-native-helpers.left-pad';
 import leftPad from './leftPad.js';
-
-// import avatar from "assets/img/faces/marc.jpg";
-
-
-// const styles = {
-//   cardCategoryWhite: {
-//     color: "rgba(255,255,255,.62)",
-//     margin: "0",
-//     fontSize: "14px",
-//     marginTop: "0",
-//     marginBottom: "0"
-//   },
-//   cardTitleWhite: {
-//     color: "#FFFFFF",
-//     marginTop: "0px",
-//     minHeight: "auto",
-//     fontWeight: "300",
-//     fontFamily: "'Roboto', 'Helvetica', 'Arial', sans-serif",
-//     marginBottom: "3px",
-//     textDecoration: "none"
-//   }
-// };
-
-// const useStyles = makeStyles(styles);
 
 const useStyles = makeStyles((theme) => ({
     button: {
@@ -83,6 +60,7 @@ export default function CouponAdd(props) {
   const classes = useStyles();
 
   const { spaceId } = props;
+  const { register, errors, handleSubmit } = useForm();
 
   // const [state, handleInputChange] = useInputs({
   const [state, setState] = React.useReducer(reducer, {
@@ -139,8 +117,8 @@ export default function CouponAdd(props) {
       return post(url, formData, config);
   };
 
-  const handleSubmit = e => {
-    e.preventDefault();
+  const onSubmit = e => {
+    //e.preventDefault();
     console.log([couponCode, couponMenu, couponEndDate]);
     addCoupon()
         .then((response) => {
@@ -188,6 +166,11 @@ export default function CouponAdd(props) {
                                 onChange={handleInputChange}
                                 name="couponCode"
                                 value={couponCode}
+                                inputProps={{
+                                  inputRef: register({ required: true }),
+                                  placeholder: errors && errors.couponCode && "This field is required"
+                                }}
+                                error={errors && errors.couponCode ? true : undefined}
                             />
                             </GridItem>
                             <GridItem xs={12} sm={12} md={12}>
@@ -196,11 +179,16 @@ export default function CouponAdd(props) {
                                 labelText="메뉴"
                                 id="couponMenu"
                                 formControlProps={{
-                                fullWidth: true
+                                  fullWidth: true
                                 }}
                                 onChange={handleInputChange}
                                 name="couponMenu"
                                 value={couponMenu}
+                                inputProps={{
+                                  inputRef: register({ required: true }),
+                                  placeholder: errors && errors.couponMenu && "This field is required"
+                                }}
+                                error={errors && errors.couponMenu ? true : undefined}
                             />
                             </GridItem>
                             <GridItem xs={12} sm={12} md={12}>
@@ -208,28 +196,28 @@ export default function CouponAdd(props) {
                                 labelText="유효기간"
                                 id="couponEndDate"
                                 formControlProps={{
-                                fullWidth: true
+                                  fullWidth: true
                                 }}
                                 onChange={handleInputChange}
                                 name="couponEndDate"
                                 value={couponEndDate}
                                 inputProps={{
+                                  inputRef: register({ required: true }),
+                                  placeholder: errors && errors.couponEndDate && "This field is required",
                                   type: "date",
                                   defaultValue: {couponEndDate}
                                 }}
+                                error={errors && errors.couponEndDate ? true : undefined}
                             />
                             </GridItem>
                         </GridContainer>
                         </CardBody>
-                        <CardFooter>
-                        {/* <Button color="primary" onClick={handleSubmit}>Create Space</Button> */}
-                        </CardFooter>
                     </Card>
                     </GridItem>
                 </GridContainer>
             </DialogContent>
             <DialogActions>
-                <Button variant="contained" color="primary" onClick={handleSubmit}>추가</Button>
+                <Button variant="contained" color="primary" onClick={handleSubmit(onSubmit)}>추가</Button>
                 <Button variant="outlined" color="inherit" onClick={handleClose}>닫기</Button>
             </DialogActions>
         </Dialog>

@@ -88,10 +88,16 @@ app.delete('/api/customers/:id', (req, res) => {
  */
 
 app.get('/api/spaces', (req, res) => {
-    connection.query(
-      "SELECT id, name, code, type, DATE_FORMAT(createdDate, '%Y-%m-%d %T') as createdDate, image FROM SPACE WHERE isDeleted = 0",
+    let sql = "SELECT id, name, code, type, DATE_FORMAT(createdDate, '%Y-%m-%d %T') as createdDate, image FROM SPACE WHERE isDeleted = 0";
+    //console.log(req.query);
+    if(req.query.orderBy && req.query.order) {
+        sql += ` ORDER BY ${req.query.orderBy} ${req.query.order}`
+    }
+    console.log(sql);
+    connection.query(sql,
       (err, rows, fields) => {
           res.send(rows);
+          //console.log(rows);
           console.log(err);
       }  
     );

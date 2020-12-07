@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { post } from 'axios';
+import { useForm } from "react-hook-form";
 // @material-ui/core components
 import { makeStyles } from "@material-ui/core/styles";
 // import InputLabel from "@material-ui/core/InputLabel";
@@ -22,30 +23,6 @@ import CardHeader from "components/Card/CardHeader.js";
 import CardBody from "components/Card/CardBody.js";
 // import CardFooter from "components/Card/CardFooter.js";
 import useInputs from './useInputs';
-
-// import avatar from "assets/img/faces/marc.jpg";
-
-
-// const styles = {
-//   cardCategoryWhite: {
-//     color: "rgba(255,255,255,.62)",
-//     margin: "0",
-//     fontSize: "14px",
-//     marginTop: "0",
-//     marginBottom: "0"
-//   },
-//   cardTitleWhite: {
-//     color: "#FFFFFF",
-//     marginTop: "0px",
-//     minHeight: "auto",
-//     fontWeight: "300",
-//     fontFamily: "'Roboto', 'Helvetica', 'Arial', sans-serif",
-//     marginBottom: "3px",
-//     textDecoration: "none"
-//   }
-// };
-
-// const useStyles = makeStyles(styles);
 
 const useStyles = makeStyles((theme) => ({
     button: {
@@ -76,6 +53,7 @@ export default function SpaceEdit(props) {
   const classes = useStyles();
 
   const { selectedItems, selectedItem } = props;
+  const { register, errors, handleSubmit } = useForm();
 
   const [state, handleInputChange] = useInputs({
     name: selectedItem.name,
@@ -125,8 +103,8 @@ export default function SpaceEdit(props) {
   }
 
 
-  const handleSubmit = e => {
-    e.preventDefault();
+  const onSubmit = e => {
+    //e.preventDefault();
     console.log([name, type, code, file]);
     editSpace()
         .then((response) => {
@@ -174,6 +152,11 @@ export default function SpaceEdit(props) {
                                 onChange={handleInputChange}
                                 name="name"
                                 value={name}
+                                inputProps={{
+                                  inputRef: register({ required: true }),
+                                  placeholder: errors && errors.name && "This field is required"
+                                }}
+                                error={errors && errors.name ? true : undefined}
                             />
                             </GridItem>
                             <GridItem xs={12} sm={12} md={6}>
@@ -186,6 +169,11 @@ export default function SpaceEdit(props) {
                                 onChange={handleInputChange}
                                 name="type"
                                 value={type}
+                                inputProps={{
+                                  inputRef: register({ required: true }),
+                                  placeholder: errors && errors.type && "This field is required"
+                                }}
+                                error={errors && errors.type ? true : undefined}
                             />
                             </GridItem>
                             <GridItem xs={12} sm={12} md={6}>
@@ -198,6 +186,11 @@ export default function SpaceEdit(props) {
                                 onChange={handleInputChange}
                                 name="code"
                                 value={code}
+                                inputProps={{
+                                  inputRef: register({ required: true }),
+                                  placeholder: errors && errors.code && "This field is required"
+                                }}
+                                error={errors && errors.code ? true : undefined}
                             />
                             </GridItem>
                             <GridItem xs={12} sm={12} md={12}>
@@ -216,7 +209,7 @@ export default function SpaceEdit(props) {
                 </GridContainer>
             </DialogContent>
             <DialogActions>
-                <Button variant="contained" color="primary" onClick={handleSubmit}>수정</Button>
+                <Button variant="contained" color="primary" onClick={handleSubmit(onSubmit)}>수정</Button>
                 <Button variant="outlined" color="inherit" onClick={handleClose}>닫기</Button>
             </DialogActions>
         </Dialog>
