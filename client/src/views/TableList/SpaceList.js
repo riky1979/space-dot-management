@@ -11,6 +11,7 @@ import CardHeader from "components/Card/CardHeader.js";
 import CardBody from "components/Card/CardBody.js";
 import SpaceTable from "./SpaceTable.js";
 import SpaceAdd from "../Forms/SpaceAdd.js";
+import { useSelector } from "react-redux";
 
 let callApi = async () => {
   const response = await fetch('/api/spaces');
@@ -42,6 +43,8 @@ export default function SpaceList() {
 
   // const { spaces, searchKeyword } = data;
 
+  const search = useSelector((store) => store.search);
+
   const callList = () => {
     callApi()
       .then(json => {
@@ -52,6 +55,7 @@ export default function SpaceList() {
   };
 
   React.useEffect(() => {
+    console.log('search.searchKeyword:'+search.searchKeyword);
     callList();
   }, []);
 

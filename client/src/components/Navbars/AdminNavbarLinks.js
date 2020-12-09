@@ -19,6 +19,10 @@ import Search from "@material-ui/icons/Search";
 import CustomInput from "components/CustomInput/CustomInput.js";
 import Button from "components/CustomButtons/Button.js";
 
+// import { useSelector, useDispatch } from 'react-redux';
+import { useDispatch } from 'react-redux';
+import * as actions from 'redux/actions';
+
 import styles from "assets/jss/material-dashboard-react/components/headerLinksStyle.js";
 
 const useStyles = makeStyles(styles);
@@ -27,6 +31,8 @@ export default function AdminNavbarLinks() {
   const classes = useStyles();
   // const [openNotification, setOpenNotification] = React.useState(null);
   const [openProfile, setOpenProfile] = React.useState(null);
+  const [keyword, setKeyword] = React.useState('');
+
   // const handleClickNotification = event => {
   //   if (openNotification && openNotification.contains(event.target)) {
   //     setOpenNotification(null);
@@ -47,6 +53,21 @@ export default function AdminNavbarLinks() {
   const handleCloseProfile = () => {
     setOpenProfile(null);
   };
+
+  const dispatch = useDispatch();
+  // const search = useSelector((store) => store.search);
+
+  const handelSearchClick = () => {
+    dispatch(actions.keywordSearch(keyword));
+    
+    // console.log('keyword:'+keyword);
+    // console.log('store.search.searchKeyword:'+search.searchKeyword);
+  };
+
+  const handleInputKeywordChange = (e) => {
+    setKeyword(e.target.value);
+  };
+
   return (
     <div>
       <div className={classes.searchWrapper}>
@@ -60,8 +81,10 @@ export default function AdminNavbarLinks() {
               "aria-label": "Search"
             }
           }}
+          value={keyword}
+          onChange={handleInputKeywordChange}
         />
-        <Button color="white" aria-label="edit" justIcon round>
+        <Button color="white" aria-label="edit" justIcon round onClick={handelSearchClick}>
           <Search />
         </Button>
       </div>

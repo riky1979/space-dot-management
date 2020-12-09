@@ -23,8 +23,8 @@ let callApi = async () => {
   //   orderBy: 'createdDate', 
   //   order: 'DESC'
   // };
-  const response = await fetch('/api/spaces?orderBy=name&order=ASC'
-  /*, {
+  const response = await fetch('/api/spaces'
+  /*, { //?orderBy=name&order=ASC
         method: 'POST', // *GET, POST, PUT, DELETE, etc.
         //mode: 'cors', // no-cors, cors, *same-origin
         //cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
