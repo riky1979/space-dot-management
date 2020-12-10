@@ -68,6 +68,13 @@ export default function AdminNavbarLinks() {
     setKeyword(e.target.value);
   };
 
+  // const handleInputKeyUp = (e) => {
+  //   console.log(e.key);
+  //   if(e.key === 'Enter') {
+  //     dispatch(actions.keywordSearch(keyword));
+  //   }
+  // };
+
   return (
     <div>
       <div className={classes.searchWrapper}>
@@ -78,7 +85,7 @@ export default function AdminNavbarLinks() {
           inputProps={{
             placeholder: "Search",
             inputProps: {
-              "aria-label": "Search"
+              "aria-label": "Search",
             }
           }}
           value={keyword}

@@ -1,4 +1,5 @@
 import React from "react";
+import { useSelector } from "react-redux";
 // @material-ui/core components
 // import { makeStyles } from "@material-ui/core/styles";
 // import Button from '@material-ui/core/Button';
@@ -11,7 +12,6 @@ import CardHeader from "components/Card/CardHeader.js";
 import CardBody from "components/Card/CardBody.js";
 import SpaceTable from "./SpaceTable.js";
 import SpaceAdd from "../Forms/SpaceAdd.js";
-import { useSelector } from "react-redux";
 
 let callApi = async () => {
   const response = await fetch('/api/spaces');
@@ -55,7 +55,6 @@ export default function SpaceList() {
   };
 
   React.useEffect(() => {
-    console.log('search.searchKeyword:'+search.searchKeyword);
     callList();
   }, []);
 
@@ -65,11 +64,13 @@ export default function SpaceList() {
   };
 
   const filteredSpaces = (data) => {
-    // if(searchKeyword) {
-    //   data = data.filter((c) => {
-    //     return c.name.indexOf(searchKeyword) > -1;
-    //   });
-    // }
+    const { searchKeyword } = search;
+    console.log('search.searchKeyword:'+search.searchKeyword);
+    if(searchKeyword !== '') {
+      data = data.filter((c) => {
+        return c.name.indexOf(searchKeyword) > -1;
+      });
+    }
     return <SpaceTable tableData={data} stateRefresh={stateRefresh} />;
   }
 

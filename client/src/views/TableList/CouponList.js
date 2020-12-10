@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
+import { useSelector } from "react-redux";
 // @material-ui/core components
 import { makeStyles } from "@material-ui/core/styles";
 // import InputLabel from "@material-ui/core/InputLabel";
@@ -16,6 +17,7 @@ import CardBody from "components/Card/CardBody.js";
 import SelectSpace from "../Controller/SelectSpace.js";
 import CouponTable from "./CouponTable.js";
 import CouponAdd from "../Forms/CouponAdd.js";
+
 
 
 
@@ -45,16 +47,18 @@ let callApi = async (spaceId) => {
   return body;
 };
 
-const convertToTableData = (data) => {
-  console.log(data);
-  return data.coupons;
-};
+// const convertToTableData = (data) => {
+//   console.log(data);
+//   return data.coupons;
+// };
 
 
 
 
 export default function CouponList() {
   const classes = useStyles();
+
+  const search = useSelector((store) => store.search);
 
   const [coupons, setCoupons] = useState('');
   // const childStateInit = React.useRef(false);
@@ -83,7 +87,7 @@ export default function CouponList() {
     callApi(selectedSpace.spaceValue)
       .then(json => {
         console.log(json);
-        setCoupons({coupons: json});
+        setCoupons(json);
       })
       .catch(err => console.log(err));
   }, [selectedSpace.spaceValue]);
@@ -100,6 +104,17 @@ export default function CouponList() {
     // childStateInit.current = false;
   };
 
+  const filteredCoupons = (data) => {
+    const { searchKeyword } = search;
+    console.log('search.searchKeyword:'+search.searchKeyword);
+    if(searchKeyword !== '') {
+      data = data.filter((c) => {
+        return c.couponCode.indexOf(searchKeyword) > -1;
+      });
+    }
+    return <CouponTable spaceId={selectedSpace.spaceValue} tableData={data} stateRefresh={stateRefresh} />;
+  }
+
   return (
     <div><SelectSpace onChange={handleChange} />
     {selectedSpace.spaceValue ? 
@@ -111,7 +126,7 @@ export default function CouponList() {
             <CouponAdd stateRefresh={stateRefresh} spaceId={selectedSpace.spaceValue} />
           </CardHeader>
           <CardBody>
-            {coupons ? <CouponTable spaceId={selectedSpace.spaceValue} tableData={convertToTableData(coupons)} stateRefresh={stateRefresh} /> : <span>loding...</span>}
+            {coupons ? filteredCoupons(coupons) : <span>loding...</span>}
             {/* forwardRef={c => { this.funcComRef = c }}  */}
           </CardBody>
         </Card>
