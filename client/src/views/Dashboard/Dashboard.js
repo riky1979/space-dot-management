@@ -28,6 +28,7 @@ import CardHeader from "components/Card/CardHeader.js";
 import CardIcon from "components/Card/CardIcon.js";
 import CardBody from "components/Card/CardBody.js";
 import CardFooter from "components/Card/CardFooter.js";
+import DashboardItem from "./DashboardItem.js";
 
 import { bugs, website, server } from "variables/general.js";
 
@@ -41,11 +42,63 @@ import styles from "assets/jss/material-dashboard-react/views/dashboardStyle.js"
 
 const useStyles = makeStyles(styles);
 
+const itemsList = [
+  {
+    num: 0, 
+    spaceName: '공간-1', 
+    couponTotCnt: 128, 
+    couponStaffCheckCnt: 92, 
+    couponConfirmOfferCnt: 54, 
+    lastInfoDate: 'Last 24 Hours'
+  },
+  {
+    num: 1, 
+    spaceName: '공간-2', 
+    couponTotCnt: 320, 
+    couponStaffCheckCnt: 245, 
+    couponConfirmOfferCnt: 183, 
+    lastInfoDate: 'Last 12 Hours'
+  },
+  {
+    num: 2, 
+    spaceName: '공간-3', 
+    couponTotCnt: 42, 
+    couponStaffCheckCnt: 32, 
+    couponConfirmOfferCnt: 15, 
+    lastInfoDate: 'Last 8 Hours'
+  },
+  {
+    num: 3, 
+    spaceName: '공간-4', 
+    couponTotCnt: 17, 
+    couponStaffCheckCnt: 10, 
+    couponConfirmOfferCnt: 5, 
+    lastInfoDate: 'Last 2 Hours'
+  },
+  {
+    num: 4, 
+    spaceName: '공간-5', 
+    couponTotCnt: 3, 
+    couponStaffCheckCnt: 2, 
+    couponConfirmOfferCnt: 1, 
+    lastInfoDate: 'Last 1 Hours'
+  },
+  {
+    num: 5, 
+    spaceName: '공간-6', 
+    couponTotCnt: 2, 
+    couponStaffCheckCnt: 1, 
+    couponConfirmOfferCnt: 1, 
+    lastInfoDate: 'Last 3 Hours'
+  },
+];
+
 export default function Dashboard() {
   const classes = useStyles();
   return (
     <div>
       <GridContainer>
+        {itemsList.map((item) => <DashboardItem status={item} />)}
         <GridItem xs={12} sm={6} md={3}>
           <Card>
             <CardHeader color="warning" stats icon>
