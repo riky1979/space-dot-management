@@ -183,8 +183,74 @@ const completedTasksChart = {
   }
 };
 
+// ##############################
+// // // monthly Chart
+// #############################
+
+const monthlyChart = {
+  data: {
+    labels: [
+      "1",
+      "2",
+      "3",
+      "4",
+      "5",
+      "6",
+      "7",
+      "8",
+      "9",
+      "10",
+      "11",
+      "12"
+    ],
+    series: [[3, 15, 18, 48, 68, 120, 326, 434, 568, 610, 756, 895]]
+  },
+  options: {
+    axisX: {
+      showGrid: false
+    },
+    low: 0,
+    high: 1000,
+    chartPadding: {
+      top: 0,
+      right: 5,
+      bottom: 0,
+      left: 0
+    }
+  },
+  responsiveOptions: [
+    [
+      "screen and (max-width: 640px)",
+      {
+        seriesBarDistance: 5,
+        axisX: {
+          labelInterpolationFnc: function(value) {
+            return value[0];
+          }
+        }
+      }
+    ]
+  ],
+  animation: {
+    draw: function(data) {
+      if (data.type === "bar") {
+        data.element.animate({
+          opacity: {
+            begin: (data.index + 1) * delays2,
+            dur: durations2,
+            from: 0,
+            to: 1,
+            easing: "ease"
+          }
+        });
+      }
+    }
+  }
+};
+
 module.exports = {
   dailySalesChart,
   emailsSubscriptionChart,
-  completedTasksChart
+  completedTasksChart,
+  monthlyChart
 };

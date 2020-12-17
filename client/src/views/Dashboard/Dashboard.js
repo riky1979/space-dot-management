@@ -29,6 +29,7 @@ import CardIcon from "components/Card/CardIcon.js";
 import CardBody from "components/Card/CardBody.js";
 import CardFooter from "components/Card/CardFooter.js";
 import DashboardItem from "./DashboardItem.js";
+import DashboardChart from "./DashboardChart.js";
 
 import { bugs, website, server } from "variables/general.js";
 
@@ -175,6 +176,7 @@ export default function Dashboard() {
         </GridItem>
       </GridContainer>
       <GridContainer>
+      {itemsList.map((item) => <DashboardChart status={item} />)}
         <GridItem xs={12} sm={12} md={4}>
           <Card chart>
             <CardHeader color="success">
