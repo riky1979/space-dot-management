@@ -99,7 +99,7 @@ export default function Dashboard() {
   return (
     <div>
       <GridContainer>
-        {itemsList.map((item) => <DashboardItem status={item} />)}
+        {itemsList.map((item) => <DashboardItem key={item.num} status={item} />)}
         <GridItem xs={12} sm={6} md={3}>
           <Card>
             <CardHeader color="warning" stats icon>
@@ -176,7 +176,7 @@ export default function Dashboard() {
         </GridItem>
       </GridContainer>
       <GridContainer>
-      {itemsList.map((item) => <DashboardChart status={item} />)}
+      {itemsList.map((item) => <DashboardChart key={item.num} status={item} />)}
         <GridItem xs={12} sm={12} md={4}>
           <Card chart>
             <CardHeader color="success">

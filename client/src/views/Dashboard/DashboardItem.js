@@ -32,9 +32,9 @@ export default function DashboardItem(props) {
             <Store />
             </CardIcon>
             <p className={classes.cardCategory}>{spaceName}</p>
-            <h4 className={classes.cardTitle}><small>total {couponTotCnt}</small></h4>
-            <h4 className={classes.cardTitle}><small>used {couponStaffCheckCnt}</small></h4>
-            <h4 className={classes.cardTitle}><small>confirm {couponConfirmOfferCnt}</small></h4>
+            <h4 className={classes.cardTitle}><small>T {couponTotCnt}</small></h4>
+            <h4 className={classes.cardTitle}><small>U {couponStaffCheckCnt}</small></h4>
+            <h4 className={classes.cardTitle}><small>C {couponConfirmOfferCnt}</small></h4>
         </CardHeader>
         <CardFooter stats>
             <div className={classes.stats}>
