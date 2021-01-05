@@ -1,12 +1,14 @@
 {
     "name": "management",
     "version": "0.1.0",
+    "description": "",
     "private": true,
     "scripts": {
         "client": "cd client && yarn start",
         "server": "nodemon server.js",
         "dev": "concurrently --kill-others-on-fail \"yarn server\" \"yarn client\""
     },
+    "author": "",
     "dependencies": {
         "@material-ui/data-grid": "^4.0.0-alpha.10",
         "body-parser": "^1.19.0",
@@ -20,5 +22,5 @@
     "devDependencies": {
         "concurrently": "^5.3.0"
     },
-    "license": "MIT"
+    "license": "ISC"
 }
