@@ -18,34 +18,31 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import { createBrowserHistory } from "history";
-import { Router, Route, Switch, Redirect } from "react-router-dom";
+import { Router } from "react-router-dom";
+// import { Router, Route, Switch, Redirect } from "react-router-dom";
 
 // core components
-import Admin from "layouts/Admin.js";
-import RTL from "layouts/RTL.js";
-import Coupon from "views/Forms/Coupon.js";
+// import Admin from "layouts/Admin.js";
+// import RTL from "layouts/RTL.js";
+// import Coupon from "views/Forms/Coupon.js";
+import App from "./App";
 
 // redux
-import { createStore } from 'redux';
-import { composeWithDevTools } from 'redux-devtools-extension';
-import rootReducer from 'redux/reducers';
+// import { createStore } from 'redux';
+// import { composeWithDevTools } from 'redux-devtools-extension';
+// import rootReducer from 'redux/reducers';
 import { Provider } from 'react-redux';
+import store from './store';
 
-import "assets/css/material-dashboard-react.css?v=1.9.0";
+// import "assets/css/material-dashboard-react.css?v=1.9.0";
 
 const hist = createBrowserHistory();
-const store = createStore(rootReducer, composeWithDevTools());
 
 ReactDOM.render(
-  <Provider store={store}>
-    <Router history={hist}>
-      <Switch>
-        <Route path="/admin" component={Admin} />
-        <Route path="/rtl" component={RTL} />
-        <Route path="/coupon/:hashCode" component={Coupon} />
-        {/* <Redirect from="/" to="/admin/dashboard" /> */}
-      </Switch>
-    </Router>
-  </Provider>,
+  <Router history={hist}>
+    <Provider store={store}>
+      <App />
+    </Provider>
+  </Router>,
   document.getElementById("root")
 );

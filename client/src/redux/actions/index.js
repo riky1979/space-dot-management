@@ -1,4 +1,4 @@
-export const KEYWORD_SEARCH = "search/KEYWORD_SEARCH";
+export const KEYWORD_SEARCH = 'search/KEYWORD_SEARCH';
 
 export const keywordSearch = (keyword) => {
     return { 

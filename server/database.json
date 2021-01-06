@@ -1,0 +1,10 @@
+{
+    "development": {
+        "host": "spacedot.cafe24app.com",
+        "user": "kjs987412",
+        "password": "spacedot1!",
+        "port": "3306",
+        "database": "kjs987412"
+    },
+    "salt": "p049saldjfpojwfjnao27p1zufp6i8k3qpm"
+}

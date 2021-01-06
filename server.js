@@ -12,7 +12,7 @@ app.use('/image', express.static(path.join(__dirname, 'upload')));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true}));
 
-const data = fs.readFileSync(path.join(__dirname, '', 'database.json'));
+const data = fs.readFileSync(path.join(__dirname, 'server', 'database.json'));
 const conf = JSON.parse(data);
 const mysql = require('mysql');
 
@@ -26,11 +26,24 @@ const connection = mysql.createConnection({
 connection.connect();
 
 
-const hashing = require(path.join(__dirname, '', 'hashing.js')); // 두번째 인자 경로? 'config'
+const hashing = require(path.join(__dirname, 'server', 'hashing.js'));
 const salt = conf.salt;
 
 const multer = require('multer');
 const upload = multer({dest: path.join(__dirname, 'upload')});
+
+
+const passport = require('passport');
+app.use(passport.initialize());
+require('./passport')(passport);
+
+const users = require('./server/routes/user');
+app.use('/api/users', users);
+
+// app.get('/api/users/login', (req, res) => {
+//     res.send({message: 'login!'});
+// });
+
 
 app.get('/admin/*', (req, res) => {
     res.sendFile(path.join(__dirname, '', 'index.html'));
@@ -38,6 +51,8 @@ app.get('/admin/*', (req, res) => {
 app.get('/coupon/:hash', (req, res) => {
     res.sendFile(path.join(__dirname, '', 'index.html'));
 });
+
+
 
 app.get('/api/customers', (req, res) => {
     connection.query(
@@ -79,7 +94,7 @@ app.delete('/api/customers/:id', (req, res) => {
 });
 
 
-// app.get('/', (req, res) => {
+// app.get('/home', (req, res) => {
 //     res.send({message: 'Hello Home!'});
 // });
 

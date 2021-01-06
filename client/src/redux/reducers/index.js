@@ -1,5 +1,7 @@
 import { combineReducers } from 'redux';
 import { KEYWORD_SEARCH } from '../actions';
+import { authReducer } from './authReducer';
+import { errorReducer } from './errorReducer';
 
 const initialState = {
     searchKeyword: ''
@@ -15,7 +17,9 @@ const search = (state = initialState, action) => {
 };
 
 const rootReducer = combineReducers({
-    search
+    search,
+    errors: errorReducer,
+    auth: authReducer,
 });
 
 export default rootReducer;
