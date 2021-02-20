@@ -151,48 +151,47 @@ export default function Coupon({ match }) {
           <Card profile>
             <CardBody profile className={classes.coupon_top_bg} style={image ? { backgroundImage: `url(${image})` } : null}>
               <h3 className={`${classes.cardTitle} ${classes.bold} ${classes.spaceName}`}>{spaceName}</h3>
-              <h3 className={classes.cardTitle}>CODE : {couponCode}</h3>
+              <h5 className={classes.cardTitle}>{couponCode}</h5>
               <hr className={classes.dotted}></hr>
-              <h2 className={`${classes.cardTitle} ${classes.bold} ${classes.minusMargin30}`}>[쿠폰]{couponMenu}</h2>
+              <h3 className={`${classes.cardTitle} ${classes.bold} ${classes.minusMargin30}`}>{couponMenu}</h3>
               <h6 className={`${classes.bold} ${classes.expired} ${classes.minusMargin1}`}>사용 만료일 {couponEndDate}</h6>
               
               {usedCoupon ? 
               <div>
                 <p className={classes.description}>
-                쿠폰 사용이 완료되었습니다.<br></br>
-                사용 후 1주일 이내에 PayBack 해드립니다.
+                직원 확인이 완료되었습니다.
                 </p>
                 <Button variant="outlined" color="default" className={classes.button}>
-                  쿠폰 사용 완료
+                  직원확인 완료
                 </Button>
               </div>
               : 
                   isExpired ? 
                   <div>
                     <p className={classes.description}>
-                    사용기간 종료된 쿠폰 입니다.
+                    구독기간이 만료 되었습니다.
                     </p>
                     <Button variant="outlined" color="default" className={classes.button}>
-                    쿠폰 사용기간 만료
+                    구독기간 만료
                   </Button>
                   </div>
                   
                   : 
                   <div>
                     <p className={classes.description}>
-                    Coffee 전용 쿠폰 입니다. 사용시 직원분께 보여주세요.<br></br>
-                    사용 후 1주일 이내에 PayBack 해드립니다.
+                    구독자 확인증입니다. 사용 전 직원에게 보여주세요.<br></br>
+                    본 확인증을 타인에게 양도 혹은 대여 할 수 없습니다.
                     </p>
                     <Button color="primary" className={classes.button} onClick={handleClickOpen}>
                       직원 확인
                     </Button>
                     <Dialog open={open} onClose={handleClose}>
                       <DialogTitle onClose={handleClose}>
-                          쿠폰 사용
+                          PerfumeToDay 사용
                       </DialogTitle>
                       <DialogContent>
                           <Typography gutterBottom>
-                              [확인]시 쿠폰이 사용처리 됩니다.
+                              [확인]시 사용처리 됩니다.
                           </Typography>
                       </DialogContent>
                       <DialogActions>
